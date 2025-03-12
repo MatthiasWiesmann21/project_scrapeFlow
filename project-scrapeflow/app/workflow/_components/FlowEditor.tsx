@@ -8,6 +8,7 @@ import {
   Connection,
   Controls,
   Edge,
+  getOutgoers,
   ReactFlow,
   useEdgesState,
   useNodesState,
@@ -118,7 +119,7 @@ function FlowEditor({ workflow }: { workflow: Workflow }) {
       );
 
       const input = targetTask.inputs.find(
-        (i) => i.name === connection.targetHandle
+        (o) => o.name === connection.targetHandle
       );
 
       if (input?.type !== output?.type) {
@@ -126,9 +127,19 @@ function FlowEditor({ workflow }: { workflow: Workflow }) {
         return false;
       }
 
-      return true;
+      const hasCycle = (node: ScrapeFlowNode, visited = new Set()) => {
+        if (visited.has(node.id)) return false;
+        visited.add(node.id);
+
+        for (const outgoer of getOutgoers(node, nodes, edges)) {
+            if (outgoer.id === connection.source) return true;
+            if (hasCycle(outgoer, visited)) return true;
+        }
+      }
+      const detectedCycle = hasCycle(target);
+      return !detectedCycle;
     },
-    [nodes]
+    [nodes, edges]
   );
 
   return (
