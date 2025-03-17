@@ -20,11 +20,13 @@ export default function ExecutionViewerPage({
         hideButtons={true}
       />
       <section className="flex h-full overflow-auto">
-        <Suspense fallback={
+        <Suspense
+          fallback={
             <div className="flex items-center justify-center">
-                <Loader2Icon className="h-10 w-10 animate-spin stroke-primary" />
+              <Loader2Icon className="h-10 w-10 animate-spin stroke-primary" />
             </div>
-        }>
+          }
+        >
           <ExecutionViewerWrapper executionId={params.executionId} />
         </Suspense>
       </section>
@@ -32,11 +34,15 @@ export default function ExecutionViewerPage({
   );
 }
 
-async function ExecutionViewerWrapper({executionId} : {executionId: string}) {
-    const workflowExecution = await GetWorkflowExecutionWithPhases(executionId);
-    if (!workflowExecution) {
-        return <div>Execution not found</div>
-    }
-    
-    return <ExecutionViewer execution={workflowExecution} />
+async function ExecutionViewerWrapper({
+  executionId,
+}: {
+  executionId: string;
+}) {
+  const workflowExecution = await GetWorkflowExecutionWithPhases(executionId);
+  if (!workflowExecution) {
+    return <div>Execution not found</div>;
+  }
+
+  return <ExecutionViewer initialData={workflowExecution} />;
 }
