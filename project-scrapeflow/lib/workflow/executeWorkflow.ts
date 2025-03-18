@@ -9,6 +9,8 @@ import { waitFor } from "../helper/waitFor";
 import { ExecutionPhase } from "@prisma/client";
 import { ScrapeFlowNode } from "@/types/scrapeFlowNode";
 import { TaskRegistry } from "./task/registry";
+import { ExecutorRegistry } from "./executor/registry";
+import { Environment } from "@/types/executor";
 
 export async function ExecuteWorkflow(executionId: string) {
   const execution = await prisma.workflowExecution.findUnique({
@@ -20,7 +22,7 @@ export async function ExecuteWorkflow(executionId: string) {
     throw new Error("Execution not found");
   }
 
-  const environment = {
+  const environment: En = {
     phases: {},
   };
 
@@ -31,7 +33,7 @@ export async function ExecuteWorkflow(executionId: string) {
   let executionFailed = false;
   for (const phase of execution.phases) {
     // TODO: consume credits
-    const phaseExecution = await executeWorkflowPhase(phase);
+    const phaseExecution = await executeWorkflowPhase(phase, environment);
     if (!phaseExecution.success) {
       executionFailed = true;
       break;
@@ -117,11 +119,15 @@ async function finaizeWorkflowExecution(
     });
 }
 
-async function executeWorkflowPhase(phase: ExecutionPhase) {
+async function executeWorkflowPhase(
+  phase: ExecutionPhase,
+  environment: Environment
+) {
   const startedAt = new Date();
   const node = JSON.parse(phase.node) as ScrapeFlowNode;
+  setupEnvironmentForPhase(node, environment);
 
-  // Update phase status
+  // Update phase statuså
   await prisma.executionPhase.update({
     where: { id: phase.id },
     data: {
@@ -137,10 +143,43 @@ async function executeWorkflowPhase(phase: ExecutionPhase) {
 
   // TODO: decrement user balance ( with required credits)
 
-  // Execute phase simulation
-  await waitFor(2000);
-  const success = Math.random() < 0.7;
+  const success = await executePhase(phase, node, environment);
 
   await finalizePhase(phase.id, success);
   return { success };
+}
+
+async function finalizePhase(phaseId: string, success: boolean) {
+  const finalStatus = success
+    ? ExecutionPhaseStatus.COMPLETED
+    : ExecutionPhaseStatus.FAILED;
+
+  await prisma.executionPhase.update({
+    where: {
+      id: phaseId,
+    },
+    data: {
+      status: finalStatus,
+      completedAt: new Date(),
+    },
+  });
+}
+
+async function executePhase(
+  phase: ExecutionPhase,
+  node: ScrapeFlowNode,
+  environment: Environment
+): Promise<boolean> {
+  const runFn = ExecutorRegistry[node.data.type];
+  if (!runFn) {
+    return false;
+  }
+  return await runFn(environment);
+}
+
+function setupEnvironmentForPhase(node: ScrapeFlowNode, environment: Environment) {
+  environment.phases[node.id] = {
+    inputs: {},
+    outputs: {},
+  }
 }
