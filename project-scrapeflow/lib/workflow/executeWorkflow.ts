@@ -10,7 +10,7 @@ import { ExecutionPhase } from "@prisma/client";
 import { ScrapeFlowNode } from "@/types/scrapeFlowNode";
 import { TaskRegistry } from "./task/registry";
 import { ExecutorRegistry } from "./executor/registry";
-import { Environment } from "@/types/executor";
+import { Environment, ExecutionEnvironment } from "@/types/executor";
 
 export async function ExecuteWorkflow(executionId: string) {
   const execution = await prisma.workflowExecution.findUnique({
@@ -22,7 +22,7 @@ export async function ExecuteWorkflow(executionId: string) {
     throw new Error("Execution not found");
   }
 
-  const environment: En = {
+  const environment: Environment = {
     phases: {},
   };
 
@@ -174,12 +174,31 @@ async function executePhase(
   if (!runFn) {
     return false;
   }
-  return await runFn(environment);
+
+  const executionEnvironment: ExecutionEnvironment<any> = createExecutionEnvironment(node, environment);
+
+  return await runFn(executionEnvironment);
 }
 
 function setupEnvironmentForPhase(node: ScrapeFlowNode, environment: Environment) {
   environment.phases[node.id] = {
     inputs: {},
     outputs: {},
+  };
+  const inputs = TaskRegistry[node.data.type].inputs;
+  for (const input of inputs) {
+    const inputValue = node.data.inputs?.[input.name];
+    if (inputValue) {
+      environment.phases[node.id].inputs[input.name] = inputValue;
+      continue;
+    }
+
+    // Get input value from outputs in the environment
   }
+}
+
+function createExecutionEnvironment(node: ScrapeFlowNode, environment: Environment) {
+  return {
+    getInput: (name: string) => environment.phases[node.id]?.inputs[name],
+  };
 }
