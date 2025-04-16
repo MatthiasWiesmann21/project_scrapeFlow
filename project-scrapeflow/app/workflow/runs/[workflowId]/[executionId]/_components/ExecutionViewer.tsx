@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { DatesToDurationString } from "@/lib/helper/dates";
 import { GetPhasesTotalCost } from "@/lib/helper/phases";
-import { ExecutionPhaseStatus, WorkflowExecutionStatus } from "@/types/workflow";
+import {
+  ExecutionPhaseStatus,
+  WorkflowExecutionStatus,
+} from "@/types/workflow";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -41,6 +44,7 @@ import {
 import { cn } from "@/lib/utils";
 import { LogLevel } from "@/types/log";
 import PhaseStatusBadge from "./PhaseStatusBadge";
+import ReactCountUpWrapper from "@/components/ReactCountUpWrapper";
 
 type ExecutionData = Awaited<ReturnType<typeof GetWorkflowExecutionWithPhases>>;
 
@@ -66,6 +70,25 @@ export default function ExecutionViewer({
   });
 
   const isRunning = query.data?.status === WorkflowExecutionStatus.RUNNING;
+
+  useEffect(() => {
+    // While running we auto-select the current running phase in the sidebar
+    const phases = query.data?.phases || [];
+    if (isRunning) {
+      // Select the last executed phase
+      const phaseToselect = phases.toSorted((a, b) =>
+        a.startedAt! > b.startedAt! ? -1 : 1
+      )[0];
+      setSelectedPhase(phaseToselect.id);
+      return;
+    }
+
+    // If not running, select the last completed phase
+    const phaseToselect = phases.toSorted((a, b) =>
+      a.completedAt! > b.completedAt! ? -1 : 1
+    )[0];
+    setSelectedPhase(phaseToselect.id);
+  }, [query.data?.phases, isRunning, setSelectedPhase]);
 
   const duration = DatesToDurationString(
     query.data?.completedAt,
@@ -110,7 +133,7 @@ export default function ExecutionViewer({
           <ExecutionLabel
             icon={CoinsIcon}
             label="Credits consumed"
-            value={creditsConsumed}
+            value={<ReactCountUpWrapper value={creditsConsumed} />}
           />
         </div>
         <Separator />
@@ -165,7 +188,7 @@ export default function ExecutionViewer({
                   <CoinsIcon size={20} className="stroke-muted-foreground" />
                   <span>Credits</span>
                 </div>
-                <span>TODO</span>
+                <span>{phaseDetails.data.creditsConsumed}</span>
               </Badge>
               <Badge variant={"outline"} className="space-x-4">
                 <div className="flex gap-1 items-center">
@@ -307,7 +330,9 @@ function LogViewer({ logs }: { logs: ExecutionLog[] | undefined }) {
                 >
                   {log.logLevel}
                 </TableCell>
-                <TableCell className="text-sm flex-1 p-[3px] pl-4">{log.message}</TableCell>
+                <TableCell className="text-sm flex-1 p-[3px] pl-4">
+                  {log.message}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
