@@ -27,7 +27,7 @@ export async function ExecuteWorkflow(executionId: string) {
     throw new Error("Execution not found");
   }
 
-  const edges = JSON.parse(execution.definition).edges as Edge[];  
+  const edges = JSON.parse(execution.definition).edges as Edge[];
 
   const environment: Environment = {
     phases: {},
@@ -36,13 +36,16 @@ export async function ExecuteWorkflow(executionId: string) {
   await initializeWorkflowExecution(executionId, execution.workflowId);
   await initializePhaseStatuses(execution);
 
-  const logCollector = createLogCollector();
-
   let creditsConsumed = 0;
   let executionFailed = false;
   for (const phase of execution.phases) {
+
     // TODO: consume credits
-    const phaseExecution = await executeWorkflowPhase(phase, environment, edges, logCollector);
+    const phaseExecution = await executeWorkflowPhase(
+      phase,
+      environment,
+      edges,
+    );
     if (!phaseExecution.success) {
       executionFailed = true;
       break;
@@ -132,8 +135,9 @@ async function executeWorkflowPhase(
   phase: ExecutionPhase,
   environment: Environment,
   edges: Edge[],
-  logCollector: LogCollector
 ) {
+  const logCollector = createLogCollector();
+
   const startedAt = new Date();
   const node = JSON.parse(phase.node) as ScrapeFlowNode;
   setupEnvironmentForPhase(node, environment, edges);
@@ -158,11 +162,16 @@ async function executeWorkflowPhase(
   const success = await executePhase(phase, node, environment, logCollector);
 
   const outputs = environment.phases[node.id].outputs;
-  await finalizePhase(phase.id, success, outputs);
+  await finalizePhase(phase.id, success, outputs, logCollector);
   return { success };
 }
 
-async function finalizePhase(phaseId: string, success: boolean, outputs: any) {
+async function finalizePhase(
+  phaseId: string,
+  success: boolean,
+  outputs: any,
+  logCollector: LogCollector
+) {
   const finalStatus = success
     ? ExecutionPhaseStatus.COMPLETED
     : ExecutionPhaseStatus.FAILED;
@@ -175,6 +184,15 @@ async function finalizePhase(phaseId: string, success: boolean, outputs: any) {
       status: finalStatus,
       completedAt: new Date(),
       outputs: JSON.stringify(outputs),
+      logs: {
+        createMany: {
+          data: logCollector.getAll().map((log) => ({
+            message: log.message,
+            logLevel: log.level,
+            timestamp: log.timestamp,
+          })),
+        },
+      },
     },
   });
 }
@@ -252,7 +270,6 @@ function createExecutionEnvironment(
     setPage: (page: Page) => (environment.page = page),
 
     log: logCollector,
-  
   };
 }
 
