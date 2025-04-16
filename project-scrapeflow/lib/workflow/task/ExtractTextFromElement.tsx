@@ -22,6 +22,8 @@ export const ExtractTextFromElementTask = {
       type: TaskParameterType.STRING,
       required: true,
     },
-  ],
-  outputs: [{ name: "Extracted text", type: TaskParameterType.STRING }],
+  ] as const,
+  outputs: [
+    { name: "Extracted text", type: TaskParameterType.STRING },
+  ] as const,
 } satisfies WorkflowTask;
