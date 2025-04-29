@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { waitFor } from "@/lib/helper/waitFor";
 import { AlertCircle, Inbox, User } from "lucide-react";
 import React, { Suspense } from "react";
-import CreteWorkflowDialog from "./_components/CreteWorkflowDialog";
+import CreteWorkflowDialog from "./_components/CreateWorkflowDialog";
 import WorkflowCard from "./_components/WorkflowCard";
 
 function page() {

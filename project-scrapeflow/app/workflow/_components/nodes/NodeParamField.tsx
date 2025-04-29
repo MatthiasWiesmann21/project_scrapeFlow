@@ -8,6 +8,7 @@ import { useReactFlow } from "@xyflow/react";
 import { ScrapeFlowNode } from "@/types/scrapeFlowNode";
 import BrowserInstanceParam from "./param/BrowserInstanceParam";
 import SelectParam from "./param/SelectParam";
+import CredentialsParam from "./param/CredentialsParam";
 
 function NodeParamField({
   param,
@@ -53,6 +54,15 @@ function NodeParamField({
     case TaskParameterType.SELECT:
       return (
         <SelectParam
+          param={param}
+          value={value}
+          updateNodeParamValue={updateNodeParamValue}
+          disabled={disabled}
+        />
+      );
+    case TaskParameterType.CREDENTIAL:
+      return (
+        <CredentialsParam
           param={param}
           value={value}
           updateNodeParamValue={updateNodeParamValue}

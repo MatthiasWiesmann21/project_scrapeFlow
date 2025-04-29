@@ -28,7 +28,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import TooltipWrapper from "@/components/TooltipWrapper";
-import DeleteWorkflowDialog from "./deleteWorkflowDialog";
+import DeleteWorkflowDialog from "./DeleteWorkflowDialog";
 import RunBtn from "./RunBtn";
 import SchedularDialog from "./SchedularDialog";
 import { Badge } from "@/components/ui/badge";

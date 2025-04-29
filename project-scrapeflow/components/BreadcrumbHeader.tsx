@@ -1,36 +1,37 @@
 "use client";
 
-import { usePathname } from 'next/navigation';
-import React from 'react'
-import { 
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-
- } from './ui/breadcrumb';
-import { MobileSidebar } from './Sidebar';
+import { usePathname } from "next/navigation";
+import React from "react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "./ui/breadcrumb";
+import { MobileSidebar } from "./Sidebar";
 
 function BreadcrumbHeader() {
-    const pathName = usePathname();
-    const paths = pathName === "/" ? [""] : pathName.split("/");
+  const pathName = usePathname();
+  const paths = pathName === "/" ? [""] : pathName.split("/");
 
   return (
     <div className="flex items-center flex-start">
-        <MobileSidebar />
-        <Breadcrumb>
+      <MobileSidebar />
+      <Breadcrumb>
         <BreadcrumbList>
-        {paths.map((path, index) => (
+          {paths.map((path, index) => (
             <React.Fragment key={index}>
-                <BreadcrumbLink className="capitalize" href={`/${path}`}>
-                    {path === "" ? "home" : path}
-                </BreadcrumbLink>
+              <BreadcrumbLink className="capitalize" href={`/${path}`}>
+                {path === "" ? "home" : path}
+              </BreadcrumbLink>
+              {index !== paths.length - 1 && <BreadcrumbSeparator />}
             </React.Fragment>
-        ))}
-        </BreadcrumbList></Breadcrumb>
+          ))}
+        </BreadcrumbList>
+      </Breadcrumb>
     </div>
-  )
+  );
 }
 
-export default BreadcrumbHeader
+export default BreadcrumbHeader;

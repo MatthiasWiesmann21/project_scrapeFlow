@@ -24,7 +24,7 @@ import { useMutation } from "@tanstack/react-query";
 import { CreateWorkflow } from "@/actions/workflows/createWorkflow";
 import { toast } from "sonner";
 
-function CreteWorkflowDialog({ triggerText }: { triggerText?: string }) {
+function CreateWorkflowDialog({ triggerText }: { triggerText?: string }) {
   const [open, setOpen] = useState(false);
 
   const form = useForm<createWorkflowSchemaType>({
@@ -116,4 +116,4 @@ function CreteWorkflowDialog({ triggerText }: { triggerText?: string }) {
   );
 }
 
-export default CreteWorkflowDialog;
+export default CreateWorkflowDialog;
