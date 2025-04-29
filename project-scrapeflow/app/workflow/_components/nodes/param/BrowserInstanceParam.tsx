@@ -3,12 +3,10 @@
 import { ParamProps } from '@/types/scrapeFlowNode';
 import React from 'react'
 
-function BrowserInstanceParam({ param }: ParamProps) {
+export default function BrowserInstanceParam({ param }: ParamProps) {
   return (
-    <p className="text-xs">
-      {param.name}
-    </p>
+    <div className='flex flex-col gap-1 w-full'>
+      Select
+    </div>
   )
 }
-
-export default BrowserInstanceParam

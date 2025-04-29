@@ -10,6 +10,7 @@ export enum TaskType {
 export enum TaskParameterType {
     STRING = "STRING",
     BROWSER_INSTANCE = "BROWSER_INSTANCE",
+    SELECT = "SELECT",
     }
 
 export interface TaskParam {
