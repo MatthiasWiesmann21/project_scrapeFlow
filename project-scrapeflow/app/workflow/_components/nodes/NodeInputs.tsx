@@ -28,7 +28,7 @@ export function NodeInput({
   return (
     <div
       className={cn(
-        "flex justify-start p-3 bg-secondary w-full",
+        "flex justify-start p-3 bg-secondary w-full relative",
         hasErrors && "bg-destructive/30"
       )}
     >
