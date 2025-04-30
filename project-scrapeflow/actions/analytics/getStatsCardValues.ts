@@ -9,13 +9,12 @@ import { WorkflowExecutionStatus } from "@/types/workflow";
 const { COMPLETED, FAILED } = WorkflowExecutionStatus;
 
 export async function GetStatsCardValues(period: Period) {
-  const dateRange = PeriodToDateRange(period);
   const { userId } = await auth();
 
   if (!userId) {
     throw new Error("Unauthorized");
   }
-
+  const dateRange = PeriodToDateRange(period);
   const executions = await prisma.workflowExecution.findMany({
     where: {
       userId,
