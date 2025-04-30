@@ -23,10 +23,11 @@ export function DatesToDurationString(
 }
 
 export function PeriodToDateRange(period: Period) {
-    const startDate = startOfMonth(period.year, period.month);
-    const endDate = endOfMonth(period.year, period.month);
-    return {
-      startDate,
-      endDate,
-    }
+  const date = new Date(period.year, period.month, 1);
+  const startDate = startOfMonth(date);
+  const endDate = endOfMonth(date);
+  return {
+    startDate,
+    endDate,
   }
+}

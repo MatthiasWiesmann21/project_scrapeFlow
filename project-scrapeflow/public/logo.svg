@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 429.6 410.77">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        fill: #02ff57;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g>
+      <g id="_Radial_Repeat_" data-name="&amp;lt;Radial Repeat&amp;gt;">
+        <path class="cls-1" d="m139.14,126l24.37-56.77L336.92,0l92.68,104.61-229.22,85.64c-29.31-30.75-31.93-33.5-61.24-64.25Z"/>
+      </g>
+      <g id="_Radial_Repeat_-2" data-name="&amp;lt;Radial Repeat&amp;gt;">
+        <path class="cls-2" d="m290.46,284.77l-24.37,56.77-173.41,69.23L0,306.16l229.22-85.64c29.31,30.75,31.93,33.5,61.24,64.25Z"/>
+      </g>
+    </g>
+  </g>
+</svg>
