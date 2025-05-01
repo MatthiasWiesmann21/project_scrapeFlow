@@ -10,6 +10,8 @@ import StatsCard from "./_components/StatsCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GetWorkflowExecutionStats } from "@/actions/analytics/getWorkflowExecutionStats";
 import ExecutionStatusChart from "./_components/ExecutionStatusChart";
+import { GetCreditUsageInPeriod } from "@/actions/analytics/getCreditUsageInPeriod";
+import CreditUsageChart from "@/app/(dashboard)/billing/_components/CreditUsageChart";
 
 function HomePage({
   searchParams,
@@ -36,6 +38,9 @@ function HomePage({
         </Suspense>
         <Suspense fallback={<Skeleton className="w-full h-[300px" />}>
           <StatsExecutionStatus selectedPeriod={period} />
+        </Suspense>
+        <Suspense fallback={<Skeleton className="w-full h-[300px" />}>
+          <CreditsUsageInPeriod selectedPeriod={period} />
         </Suspense>
       </div>
     </div>
@@ -90,8 +95,21 @@ async function StatsExecutionStatus({
   selectedPeriod: Period;
 }) {
   const data = await GetWorkflowExecutionStats(selectedPeriod);
+  return <ExecutionStatusChart data={data} />;
+}
+
+async function CreditsUsageInPeriod({
+  selectedPeriod,
+}: {
+  selectedPeriod: Period;
+}) {
+  const data = await GetCreditUsageInPeriod(selectedPeriod);
   return (
-    <ExecutionStatusChart data={data} />
+    <CreditUsageChart
+      data={data}
+      title="Daily credits spent"
+      description="Daily credits consumed in selected period"
+    />
   );
 }
 
